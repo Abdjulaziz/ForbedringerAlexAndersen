@@ -8,6 +8,10 @@
             rel="stylesheet"
         />
         <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.css"
+            rel="stylesheet"
+        />
+        <link
             href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.1/css/all.css"
             rel="stylesheet"
         />
@@ -50,11 +54,25 @@
                         $("#onDateClickModal").modal("show");
                         $("#fra,#til").on("change", function () {
                             $("#dateStatus").html(fra.value + " - " + til.value);
-
+                        });
+                        $("#saveDateInfo").click(function () {
+                            $("#onDateClickModal").modal("hide");
                             info.dayEl.dataset.availableFrom = fra.value;
                             info.dayEl.dataset.availableTo = til.value;
                         });
+                        $("#clearDateInfo").click(function () {
+                            $("#onDateClickModal").modal("hide");
+                            $("#dateStatus").html("Ledig");
+                            $("#fra").val("");
+                            $("#til").val("");
+                            info.dayEl.dataset.availableFrom = "";
+                            info.dayEl.dataset.availableTo = "";
+                        });
                     },
+
+                    /*   if ($("saveDateInfo").click) {
+                            console.log("kage");
+                        } */
                 });
 
                 calendar1.render();
@@ -72,7 +90,7 @@
                 $("#availability").on("click", function () {
                     setTimeout(function () {
                         calendar2.updateSize();
-                    }, 250);
+                    }, 210);
                 });
             });
         </script>
@@ -85,6 +103,7 @@
             tabindex="-1"
             aria-labelledby="onDateClickModalLabel"
             aria-hidden="true"
+            data-bs-backdrop="static"
         >
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -114,10 +133,10 @@
                         </div>
                     </div>
                     <div class="text-center my-4">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                        <button type="button" id="clearDateInfo" class="btn btn-danger">
                             afmeld
                         </button>
-                        <button type="button" class="btn btn-success">gem</button>
+                        <button type="button" id="saveDateInfo" class="btn btn-success">gem</button>
                     </div>
                 </div>
             </div>
