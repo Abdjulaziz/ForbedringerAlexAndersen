@@ -36,6 +36,7 @@
                     locale: "local",
                     height: "auto",
                     headerToolbar: false,
+                    eventColor: "#ffae42",
                     dateClick: function (info) {
                         if (info.dayEl.dataset.availableFrom || info.dayEl.dataset.availableTo) {
                             $("#dateStatus").html(
@@ -50,16 +51,45 @@
                             $("#fra,#til").val("");
                         }
 
+                        //Add availability on button click
                         $("#dateDate").html(info.dateStr);
                         $("#onDateClickModal").modal("show");
+
+                        $("#fra,#til").unbind("change");
                         $("#fra,#til").on("change", function () {
                             $("#dateStatus").html(fra.value + " - " + til.value);
                         });
+
+                        $("#saveDateInfo").unbind("click");
                         $("#saveDateInfo").click(function () {
-                            $("#onDateClickModal").modal("hide");
-                            info.dayEl.dataset.availableFrom = fra.value;
-                            info.dayEl.dataset.availableTo = til.value;
+                            console.log($("#fra").val());
+                            if ($("#fra").val() && $("#til").val()) {
+                                info.dayEl.dataset.availableFrom = fra.value;
+                                info.dayEl.dataset.availableTo = til.value;
+
+                                let startTime = info.dayEl.dataset.availableFrom;
+                                let endTime = info.dayEl.dataset.availableTo;
+                                let date = Date.parse(info.dateStr);
+                                if (!isNaN(date.valueOf())) {
+                                    // valid?
+                                    calendar1.addEvent({
+                                        id: 1,
+                                        title: startTime + " - " + endTime,
+                                        start: date,
+                                        allDay: false,
+                                    });
+                                } else {
+                                    alert("Invalid date.");
+                                }
+                                $("#onDateClickModal").modal("hide");
+                            } else {
+                                alert("Tidsrum skal udfyldes");
+                            }
+                            /*  if ( $("#fra").val() && $("#til").val() == not){ */
                         });
+
+                        $("#clearDateInfo").unbind("click");
+                        //Delete all info from date on button click
                         $("#clearDateInfo").click(function () {
                             $("#onDateClickModal").modal("hide");
                             $("#dateStatus").html("Ledig");
@@ -67,12 +97,10 @@
                             $("#til").val("");
                             info.dayEl.dataset.availableFrom = "";
                             info.dayEl.dataset.availableTo = "";
+                            var event = calendar1.getEventById("1");
+                            event.remove();
                         });
                     },
-
-                    /*   if ($("saveDateInfo").click) {
-                            console.log("kage");
-                        } */
                 });
 
                 calendar1.render();
@@ -142,36 +170,8 @@
             </div>
         </div>
         <div class="calendar-wrapper" id="calendar-wrapper"></div>
+
         <!-- Modal -->
-        <!--         <div
-            class="modal fade"
-            id="dateClick"
-            tabindex="-1"
-            aria-labelledby="dateClickLabel"
-            aria-hidden="true"
-        >
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                        ></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <h2 id="dateDate"></h2>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
-                        </button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                    </div>
-                </div>
-            </div>
-        </div> -->
 
         <!-- Button trigger modal -->
         <button
