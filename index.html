@@ -62,7 +62,6 @@
 
                         $("#saveDateInfo").unbind("click");
                         $("#saveDateInfo").click(function () {
-                            console.log($("#fra").val());
                             if ($("#fra").val() && $("#til").val()) {
                                 info.dayEl.dataset.availableFrom = fra.value;
                                 info.dayEl.dataset.availableTo = til.value;
@@ -76,7 +75,7 @@
                                         id: 1,
                                         title: startTime + " - " + endTime,
                                         start: date,
-                                        allDay: false,
+                                        allDay: true,
                                     });
                                 } else {
                                     alert("Invalid date.");
@@ -106,7 +105,7 @@
                 calendar1.render();
 
                 //Second calendar - Redigere rådighed dato
-
+                var singleDateClicks = [];
                 var calendarEl = document.getElementById("calendar2");
                 var calendar2 = new FullCalendar.Calendar(calendarEl, {
                     timeZone: "local",
@@ -119,19 +118,23 @@
 
                     dateClick: function (info) {
                         let date = Date.parse(info.dateStr);
-
                         var event = calendar2.getEventById(date);
-
+                        var eventObj1 = {
+                            id: date,
+                            title: "",
+                            start: date,
+                            allDay: true,
+                        };
+                        /* for (var i = 0; i < singleDateClicks.length; i++) {
+                            singleDateClicks.push(eventObj1);
+                        } */
+                        singleDateClicks.push(eventObj1);
+                        console.log(singleDateClicks);
                         if (event !== null) {
                             event.remove();
                         } else {
                             if (!isNaN(date.valueOf())) {
-                                calendar2.addEvent({
-                                    id: date,
-                                    title: "",
-                                    start: date,
-                                    allDay: true,
-                                });
+                                calendar2.addEvent(eventObj1);
                             } else {
                                 alert("Ugyldig dato");
                             }
@@ -144,6 +147,42 @@
                     setTimeout(function () {
                         calendar2.updateSize();
                     }, 210);
+                });
+
+                var eventObj2;
+                function isObjectEmpty(object) {
+                    var isEmpty = true;
+                    for (keys in object) {
+                        isEmpty = false;
+                        break; // exiting since we found that the object is not empty
+                    }
+                    return isEmpty;
+                }
+
+                $("#savePeriod").on("click", function () {
+                    let start = Date.parse(document.getElementById("datoStart").value);
+                    let end = Date.parse(document.getElementById("datoEnd").value) + 86400000;
+
+                    eventObj2 = {
+                        id: start,
+                        title: "",
+                        start: start,
+                        end: end,
+                        allDay: true,
+                    };
+
+                    calendar2.addEvent(eventObj2);
+                });
+                $("#saveToCalender").on("click", function () {
+                    if (singleDateClicks.length > 0) {
+                        for (var i = 0; i < singleDateClicks.length; i++) {
+                            calendar1.addEvent(singleDateClicks[i]);
+                        }
+                    }
+                    if (!isObjectEmpty(eventObj2)) {
+                        calendar1.addEvent(eventObj2);
+                    }
+                    $("#periodeModal").modal("hide");
                 });
             });
         </script>
@@ -204,7 +243,7 @@
                 type="button"
                 class="btn btn-success"
                 data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
+                data-bs-target="#periodeModal"
                 id="availability"
             >
                 Rediger rådighed
@@ -214,9 +253,9 @@
         <!-- Modal -->
         <div
             class="modal fade"
-            id="exampleModal"
+            id="periodeModal"
             tabindex="-1"
-            aria-labelledby="exampleModalLabel"
+            aria-labelledby="periodeModalLabel"
             aria-hidden="true"
         >
             <div class="modal-dialog">
@@ -234,18 +273,25 @@
                         <div class="d-flex justify-content-center mx-auto">
                             <label class="text-success mx-3"
                                 >Fra
-                                <input type="date" class="form-control" />
+                                <input type="date" id="datoStart" class="form-control" />
                             </label>
                             <label class="text-success mx-3"
                                 >Til
-                                <input type="date" class="form-control" />
+                                <input type="date" id="datoEnd" class="form-control" />
                             </label>
+                        </div>
+                        <div class="text-center my-5">
+                            <button type="button" class="btn btn-success" id="savePeriod">
+                                Gem periode
+                            </button>
                         </div>
                         <div class="calendar my-4" id="calendar2"></div>
                     </div>
 
                     <div class="text-center my-4">
-                        <button type="button" class="btn btn-success">Gem</button>
+                        <button type="button" class="btn btn-success" id="saveToCalender">
+                            Gem
+                        </button>
                     </div>
                 </div>
             </div>
